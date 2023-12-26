@@ -22,6 +22,7 @@ type readBuffer struct {
 	buf                       bytes.Buffer
 	err                       error
 	backPressure              *backPressure
+	close                     bool
 }
 
 func newReadBuffer(id int64, backPressure *backPressure) *readBuffer {
@@ -112,16 +113,23 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 		if t != nil {
 			t.Stop()
 		}
+		if r.close {
+
+			println(">>>>>>readBuffer.Read end")
+			return 0, io.EOF
+		}
 	}
 }
 
 func (r *readBuffer) Close(err error) error {
-	println("readBuffer.Close called")
+	//println("readBuffer.Close called")
 	r.cond.L.Lock()
 	defer r.cond.L.Unlock()
 	if r.err == nil {
 		r.err = err
 	}
 	r.cond.Broadcast()
+	r.close = true
+	println("readBuffer.Close and broadcast called")
 	return nil
 }
