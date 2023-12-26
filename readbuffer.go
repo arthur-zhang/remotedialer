@@ -32,7 +32,7 @@ func newReadBuffer(id int64, backPressure *backPressure) *readBuffer {
 		cond: sync.Cond{
 			L: &sync.Mutex{},
 		},
-		deadline: time.Now().Add(3 * time.Second),
+		//deadline: time.Now().Add(3 * time.Second),
 	}
 }
 
@@ -57,7 +57,7 @@ func (r *readBuffer) Offer(reader io.Reader) error {
 		return err
 	} else if n > 0 {
 		r.offerCount += n
-		r.deadline = time.Now().Add(3 * time.Second)
+		//r.deadline = time.Now().Add(3 * time.Second)
 		r.cond.Broadcast()
 	}
 
@@ -86,7 +86,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 				panic("bytes.Buffer returned err=\"" + err.Error() + "\" when buffer length was > 0")
 			}
 			r.readCount += int64(n)
-			r.deadline = time.Now().Add(10 * time.Second)
+			//r.deadline = time.Now().Add(10 * time.Second)
 			r.cond.Broadcast()
 			if r.buf.Len() < MaxBuffer/8 {
 				r.backPressure.Resume()
@@ -112,7 +112,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 
 		var t *time.Timer
 		if !r.deadline.IsZero() {
-			r.deadline = time.Now().Add(3 * time.Second)
+			//r.deadline = time.Now().Add(3 * time.Second)
 			t = time.AfterFunc(r.deadline.Sub(now), func() { r.cond.Broadcast() })
 		}
 
