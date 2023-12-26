@@ -73,8 +73,6 @@ func (r *readBuffer) Offer(reader io.Reader) error {
 }
 
 func (r *readBuffer) Read(b []byte) (int, error) {
-	r.cond.L.Lock()
-	defer r.cond.L.Unlock()
 
 	for {
 		if r.buf.Len() > 0 {
@@ -87,7 +85,12 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 			}
 			r.readCount += int64(n)
 			//r.deadline = time.Now().Add(10 * time.Second)
-			r.cond.Broadcast()
+			{
+
+				r.cond.L.Lock()
+				defer r.cond.L.Unlock()
+				r.cond.Broadcast()
+			}
 			if r.buf.Len() < MaxBuffer/8 {
 				r.backPressure.Resume()
 			}
@@ -116,7 +119,21 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 			t = time.AfterFunc(r.deadline.Sub(now), func() { r.cond.Broadcast() })
 		}
 
-		r.cond.Wait()
+		go func() {
+			r.cond.L.Lock()
+			defer r.cond.L.Unlock()
+			r.cond.Wait()
+		}()
+		c := make(chan struct{})
+
+		select {
+		case <-c:
+			{
+
+			}
+		case <-time.After(3 * time.Second):
+		}
+
 		if t != nil {
 			t.Stop()
 		}
