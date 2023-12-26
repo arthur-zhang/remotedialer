@@ -42,7 +42,10 @@ func (c *connection) tunnelClose(err error) {
 }
 
 func (c *connection) doTunnelClose(err error) {
-	println("doTunnelClose, err:", err)
+	println("doTunnelClose1, err:", err.Error())
+	if c.err != nil {
+		println("doTunnelClose2, c.err is not nil, err:", c.err.Error())
+	}
 	//if c.err != nil {
 	//	return
 	//}
