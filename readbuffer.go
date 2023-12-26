@@ -128,8 +128,8 @@ func (r *readBuffer) Close(err error) error {
 	if r.err == nil {
 		r.err = err
 	}
-	r.cond.Broadcast()
 	r.close = true
+	r.cond.Broadcast()
 	println("readBuffer.Close and broadcast called")
 	return nil
 }
