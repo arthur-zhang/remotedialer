@@ -116,6 +116,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 }
 
 func (r *readBuffer) Close(err error) error {
+	println("readBuffer.Close called")
 	r.cond.L.Lock()
 	defer r.cond.L.Unlock()
 	if r.err == nil {

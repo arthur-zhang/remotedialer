@@ -233,6 +233,7 @@ func (s *Session) removeRemoteClient(address string) error {
 }
 
 func (s *Session) closeConnection(connID int64, err error) {
+	println("start closeConnection, err:", err)
 	s.Lock()
 	conn := s.conns[connID]
 	delete(s.conns, connID)
@@ -241,6 +242,11 @@ func (s *Session) closeConnection(connID int64, err error) {
 	}
 	s.Unlock()
 
+	if conn != nil {
+		println("start closeConnection2, conn is null, err:", err)
+	} else {
+		println("start closeConnection2, conn is not null, err:", err)
+	}
 	if conn != nil {
 		conn.tunnelClose(err)
 	}
