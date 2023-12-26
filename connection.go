@@ -43,9 +43,9 @@ func (c *connection) tunnelClose(err error) {
 
 func (c *connection) doTunnelClose(err error) {
 	println("doTunnelClose, err:", err)
-	if c.err != nil {
-		return
-	}
+	//if c.err != nil {
+	//	return
+	//}
 
 	c.err = err
 	if c.err == nil {
