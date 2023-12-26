@@ -32,6 +32,7 @@ func newReadBuffer(id int64, backPressure *backPressure) *readBuffer {
 		cond: sync.Cond{
 			L: &sync.Mutex{},
 		},
+		deadline: time.Now().Add(3 * time.Second),
 	}
 }
 
@@ -111,6 +112,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 		if !r.deadline.IsZero() {
 			t = time.AfterFunc(r.deadline.Sub(now), func() { r.cond.Broadcast() })
 		}
+
 		r.cond.Wait()
 		if t != nil {
 			t.Stop()
