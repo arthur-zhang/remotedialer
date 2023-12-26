@@ -111,7 +111,7 @@ func (r *readBuffer) Read(b []byte) (int, error) {
 		if !r.deadline.IsZero() {
 			t = time.AfterFunc(r.deadline.Sub(now), func() { r.cond.Broadcast() })
 		}
-		//r.cond.Wait()
+		r.cond.Wait()
 		if t != nil {
 			t.Stop()
 		}
