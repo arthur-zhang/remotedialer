@@ -51,6 +51,8 @@ func (r *readBuffer) Offer(reader io.Reader) error {
 
 	if n, err := io.Copy(&r.buf, reader); err != nil {
 		r.offerCount += n
+		r.close = true
+		r.cond.Broadcast()
 		return err
 	} else if n > 0 {
 		r.offerCount += n
